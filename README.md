@@ -1,8 +1,8 @@
 # c_datastructures
 Implementing some datastructures as i need them
 
-##Hashtable
-###Usage
+## Hashtable
+### Usage
 ```
 #define HASHTABLE_IMPLEMENTATION
 #include "hashtable.h"
