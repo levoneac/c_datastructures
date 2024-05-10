@@ -2,6 +2,7 @@
 Implementing some datastructures as i need them
 
 ## Hashtable
+The user must keep track of types themselves
 ### Usage
 ```
 #define HASHTABLE_IMPLEMENTATION
@@ -17,6 +18,5 @@ int main(void){
     };
     hash_insert(htable, &key1, sizeof(key1), &value1, sizeof(value1));
     test ret = *(test*)hash_get_from_key(htable, &key1);
-    printf("x: %ld, y: %d, z: %e\n", ret.x, ret.y, ret.z);
 }
 ```
