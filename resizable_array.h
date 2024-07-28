@@ -63,10 +63,8 @@ void r_arr_free(resizeable_array *arr);
 // Returns true if size was successfully reduced or no reduction was needed
 // Returns false if reduction could be done but allocation failed
 bool r_arr_refit(resizeable_array *arr);
-#endif // RESIZABLE_ARRAY_H
 
-// remoive
-#define RESIZABLE_ARRAY_IMPLEMENTATION
+#endif // RESIZABLE_ARRAY_H
 #ifdef RESIZABLE_ARRAY_IMPLEMENTATION
 
 resizeable_array r_arr_init(int sizeof_type)
