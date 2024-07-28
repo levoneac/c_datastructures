@@ -3,6 +3,7 @@ Implementing some datastructures as i need them. Keep in mind that these are not
 
 ## Hashtable
 The user must keep track of types themselves
+Supports: inserting and getting
 ### Usage
 ```
 #define HASHTABLE_IMPLEMENTATION
@@ -27,6 +28,8 @@ int main(void){
 
 ## Resizeable array
 The user must keep track of types themselves
+Supports: setting, inserting, getting, finding index of a value, removing and pop
+
 ### Usage
 ```
 #define RESIZABLE_ARRAY_IMPLEMENTATION
