@@ -54,7 +54,7 @@
     void hash_free(Hashtable htable);
 
 #endif //HASHTABLE_H
-#define HASHTABLE_IMPLEMENTATION
+
 #ifdef HASHTABLE_IMPLEMENTATION
 
     Node* node_create(void* ptr_key, size_t key_size, void* ptr_value, size_t value_size){
