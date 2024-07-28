@@ -18,7 +18,7 @@ int main(void){
     };
     hash_insert(htable, &key1, sizeof(key1), &value1, sizeof(value1));
     test *ret = (test *)hash_get_from_key(htable, &key1); // might be NULL
-
+    printf("x: %ld, y: %d, z: %e\n", ret->x, ret->y, ret->z);
     ...
 
     hash_free(htable);
@@ -40,7 +40,7 @@ int main(void){
         .z = 3.3131};
     r_arr_insert(&arr, 0, &value2);
     test *ret2 = (test *)r_arr_get(&arr, 0); // might be NULL
-
+    printf("x: %ld, y: %d, z: %e\n", ret2->x, ret2->y, ret2->z);
     ...
 
     r_arr_free(&arr);
