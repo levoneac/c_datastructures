@@ -12,42 +12,85 @@ typedef enum
 {
     MIN,
     MAX
-} heaptype_t;
+} Heaptype_t;
 
-typedef struct
+typedef enum
+{
+    FLOAT,
+    LONG,
+    ULONG,
+} Heapdatatype_t;
+
+typedef struct Heapnode_f
 {
     float value;
-    heapnode_f *lchild;
-    heapnode_f *rchild;
+    struct Heapnode_f *lchild;
+    struct Heapnode_f *rchild;
 
-} heapnode_f;
+} Heapnode_f;
 
-typedef struct
+typedef struct Heapnode_l
 {
     long value;
-    heapnode_l *lchild;
-    heapnode_l *rchild;
+    struct Heapnode_l *lchild;
+    struct Heapnode_l *rchild;
 
-} heapnode_l;
+} Heapnode_l;
 
-typedef struct
+typedef struct Heapnode_ul
 {
     unsigned long value;
-    heapnode_ul *lchild;
-    heapnode_ul *rchild;
+    struct Heapnode_ul *lchild;
+    struct Heapnode_ul *rchild;
 
-} heapnode_ul;
+} Heapnode_ul;
 
 typedef struct
 {
-    void *heap;
-    heaptype_t type;
-} heap;
+    Resizeable_array *Heap;
+    Heaptype_t type;
+} Heap;
 
-heap heap_init(heaptype_t type);
+Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
+void heap_free(Heap *hp);
 
 #endif // HEAP_DEFINITION
 
-#ifdef HEAP_IMPLEMENTATION
+// REMOVE
+// #define HEAP_IMPLEMENTATION
 
+#ifdef HEAP_IMPLEMENTATION
+#ifndef HEAP_IMPLEMENTATED
+#define HEAP_IMPLEMENTATED
+Heap heap_init(Heaptype_t type, Heapdatatype_t datatype)
+{
+    Resizeable_array Heaparr;
+    if (datatype == FLOAT)
+    {
+        Heaparr = r_arr_init(sizeof(float));
+    }
+
+    else if (datatype == LONG)
+    {
+        Heaparr = r_arr_init(sizeof(long));
+    }
+
+    else if (datatype == ULONG)
+    {
+        Heaparr = r_arr_init(sizeof(unsigned long));
+    }
+
+    Heap hp = {
+        .Heap = &Heaparr,
+        .type = type};
+
+    return hp;
+}
+
+void heap_free(Heap *hp)
+{
+    r_arr_free(hp->Heap);
+}
+
+#endif
 #endif // HEAP_IMPLEMENTATION

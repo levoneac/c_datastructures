@@ -23,54 +23,56 @@ typedef struct
 
     // pointer to the array
     void *data;
-} resizeable_array;
+} Resizeable_array;
 
 // Initializes an array with this specific type
-resizeable_array r_arr_init(int sizeof_type);
+Resizeable_array r_arr_init(int sizeof_type);
 
 // Returns false on failure and true on success.
 // Old data pointer is kept
-bool _r_arr_realloc(resizeable_array *arr);
+bool _r_arr_realloc(Resizeable_array *arr);
 
 // Sets element at index to value
 // Returns false on failure and true on success
-bool r_arr_set(resizeable_array *arr, idx_t index, void *value);
+bool r_arr_set(Resizeable_array *arr, idx_t index, void *value);
 
 // Inserts value at index and shifts the existing elems
-bool r_arr_insert(resizeable_array *arr, idx_t index, void *value);
+bool r_arr_insert(Resizeable_array *arr, idx_t index, void *value);
 
 // Gets a reference to the value at the given index
 // Be sure to not directly modify data at this address
-void *r_arr_get(resizeable_array *arr, idx_t index);
+void *r_arr_get(Resizeable_array *arr, idx_t index);
 
 // Removes element at given index
-bool r_arr_remove(resizeable_array *arr, idx_t index);
+bool r_arr_remove(Resizeable_array *arr, idx_t index);
 
 // Removes and gets element at last index
 // !Memoty gets allocated for the returned element here!
-void *r_arr_pop(resizeable_array *arr);
+void *r_arr_pop(Resizeable_array *arr);
 
 // Returns index of first found value
-idx_t r_arr_find(resizeable_array *arr, void *value);
+idx_t r_arr_find(Resizeable_array *arr, void *value);
 
 // Prints out all the data interpreted as integers
-void r_arr_print_as_int(resizeable_array arr);
+void r_arr_print_as_int(Resizeable_array arr);
 
 // Frees the array
-void r_arr_free(resizeable_array *arr);
+void r_arr_free(Resizeable_array *arr);
 
 // Makes maxsize fit to existing data
 // Returns true if size was successfully reduced or no reduction was needed
 // Returns false if reduction could be done but allocation failed
-bool r_arr_refit(resizeable_array *arr);
+bool r_arr_refit(Resizeable_array *arr);
 
 #endif // RESIZABLE_ARRAY_H
 #ifdef RESIZABLE_ARRAY_IMPLEMENTATION
+#ifndef RESIZABLE_ARRAY_IMPLEMENTED
+#define RESIZABLE_ARRAY_IMPLEMENTED
 
-resizeable_array r_arr_init(int sizeof_type)
+Resizeable_array r_arr_init(int sizeof_type)
 {
 
-    resizeable_array arr = {
+    Resizeable_array arr = {
         .max_size = INITIAL_SIZE,
         .real_size = 0,
         .sizeof_type = sizeof_type,
@@ -79,7 +81,7 @@ resizeable_array r_arr_init(int sizeof_type)
     return arr;
 }
 
-bool _r_arr_realloc(resizeable_array *arr)
+bool _r_arr_realloc(Resizeable_array *arr)
 {
     if (arr->real_size + 1 >= arr->max_size) // assign more space if needed
     {
@@ -94,7 +96,7 @@ bool _r_arr_realloc(resizeable_array *arr)
     }
     return true;
 }
-bool r_arr_refit(resizeable_array *arr)
+bool r_arr_refit(Resizeable_array *arr)
 {
     idx_t bound = INITIAL_SIZE;
     while (bound < arr->real_size)
@@ -117,7 +119,7 @@ bool r_arr_refit(resizeable_array *arr)
     return true;
 }
 
-void *_r_arr_get_dataptr_from_index(resizeable_array *arr, idx_t index)
+void *_r_arr_get_dataptr_from_index(Resizeable_array *arr, idx_t index)
 {
     if (index < 0 || index >= arr->real_size)
     {
@@ -129,7 +131,7 @@ void *_r_arr_get_dataptr_from_index(resizeable_array *arr, idx_t index)
     return data_start;
 }
 
-bool r_arr_remove(resizeable_array *arr, idx_t index)
+bool r_arr_remove(Resizeable_array *arr, idx_t index)
 {
     if (index >= arr->real_size)
     {
@@ -153,7 +155,7 @@ bool r_arr_remove(resizeable_array *arr, idx_t index)
     return true;
 }
 
-void *r_arr_pop(resizeable_array *arr)
+void *r_arr_pop(Resizeable_array *arr)
 {
     void *ret = malloc(arr->sizeof_type);
     memcpy(ret, _r_arr_get_dataptr_from_index(arr, arr->real_size - 1), arr->sizeof_type);
@@ -161,7 +163,7 @@ void *r_arr_pop(resizeable_array *arr)
     return ret;
 }
 
-idx_t r_arr_find(resizeable_array *arr, void *value)
+idx_t r_arr_find(Resizeable_array *arr, void *value)
 {
     for (idx_t i = 0; i < arr->real_size; i++)
     {
@@ -174,7 +176,7 @@ idx_t r_arr_find(resizeable_array *arr, void *value)
 }
 
 // maybe make wrapping function to save the state of the array in case of error?
-bool r_arr_set(resizeable_array *arr, idx_t index, void *value)
+bool r_arr_set(Resizeable_array *arr, idx_t index, void *value)
 {
 
     if (!_r_arr_realloc(arr))
@@ -195,7 +197,7 @@ bool r_arr_set(resizeable_array *arr, idx_t index, void *value)
     return true;
 }
 
-bool r_arr_insert(resizeable_array *arr, idx_t index, void *value)
+bool r_arr_insert(Resizeable_array *arr, idx_t index, void *value)
 {
     if (!_r_arr_realloc(arr))
     {
@@ -228,11 +230,11 @@ bool r_arr_insert(resizeable_array *arr, idx_t index, void *value)
     return true;
 }
 
-void *r_arr_get(resizeable_array *arr, idx_t index)
+void *r_arr_get(Resizeable_array *arr, idx_t index)
 {
     return _r_arr_get_dataptr_from_index(arr, index);
 }
-void r_arr_print_as_int(resizeable_array arr)
+void r_arr_print_as_int(Resizeable_array arr)
 {
     printf("len: %lu\n", arr.real_size);
     for (idx_t i = 0; i < arr.real_size; i++)
@@ -241,7 +243,7 @@ void r_arr_print_as_int(resizeable_array arr)
     }
 }
 
-void r_arr_free(resizeable_array *arr)
+void r_arr_free(Resizeable_array *arr)
 {
     // wrong
 
@@ -260,4 +262,5 @@ void r_arr_free(resizeable_array *arr)
     //  and as we only have memcpy'd within the block, it also frees the memcpy'ed values
     free(arr->data);
 }
+#endif
 #endif
