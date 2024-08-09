@@ -47,11 +47,17 @@ typedef struct Heapnode_ul
 
 typedef struct
 {
-    Resizeable_array *Heap;
     Heaptype_t type;
+    Heapdatatype_t datatype;
+    Resizeable_array *heap;
 } Heap;
 
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
+bool heap_insert(Heap hp, void *value);
+void *heap_pop(Heap hp);
+bool _heap_swap(Heap hp, idx_t node);
+bool _heap_sort(Heap hp);
+Resizeable_array heapsort(Heap hp);
 void heap_free(Heap *hp);
 
 #endif // HEAP_DEFINITION
@@ -64,32 +70,33 @@ void heap_free(Heap *hp);
 #define HEAP_IMPLEMENTATED
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype)
 {
-    Resizeable_array Heaparr;
+    Resizeable_array heaparr;
     if (datatype == FLOAT)
     {
-        Heaparr = r_arr_init(sizeof(float));
+        heaparr = r_arr_init(sizeof(float));
     }
 
     else if (datatype == LONG)
     {
-        Heaparr = r_arr_init(sizeof(long));
+        heaparr = r_arr_init(sizeof(long));
     }
 
     else if (datatype == ULONG)
     {
-        Heaparr = r_arr_init(sizeof(unsigned long));
+        heaparr = r_arr_init(sizeof(unsigned long));
     }
 
     Heap hp = {
-        .Heap = &Heaparr,
-        .type = type};
+        .type = type,
+        .datatype = datatype,
+        .heap = &heaparr};
 
     return hp;
 }
 
 void heap_free(Heap *hp)
 {
-    r_arr_free(hp->Heap);
+    r_arr_free(hp->heap);
 }
 
 #endif
