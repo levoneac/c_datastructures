@@ -60,6 +60,7 @@ typedef struct
 // Heaptype: MAX, MIN
 // Heapdatatype: FLOAT, LONG, ULONG, INTEGER
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
+Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_array *arr);
 bool heap_insert(Heap *hp, void *value);
 void *heap_pop(Heap hp);
 bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx);
@@ -110,6 +111,19 @@ Heap heap_init(Heaptype_t type, Heapdatatype_t datatype)
         .datatype = datatype,
         .sizeof_type = sizeof_type,
         .heap = heaparr};
+
+    return hp;
+}
+
+Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_array *arr)
+{
+    Heap hp = {
+        .type = type,
+        .datatype = datatype,
+        .sizeof_type = arr->sizeof_type,
+        .heap = *arr};
+
+    _heap_build(&hp);
 
     return hp;
 }
@@ -192,7 +206,7 @@ int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx)
 
     else if (hp->datatype == INTEGER)
     {
-        printf("parent: %d, child: %d\n", *(int *)parent, *(int *)child);
+        // printf("parent: %d, child: %d\n", *(int *)parent, *(int *)child);
         if (*(int *)parent > *(int *)child)
         {
             return 1;

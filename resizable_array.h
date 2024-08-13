@@ -19,14 +19,14 @@ typedef struct
     idx_t real_size;
 
     // size of the arraytype
-    int sizeof_type;
+    size_t sizeof_type;
 
     // pointer to the array
     void *data;
 } Resizeable_array;
 
 // Initializes an array with this specific type
-Resizeable_array r_arr_init(int sizeof_type);
+Resizeable_array r_arr_init(size_t sizeof_type);
 
 // Returns false on failure and true on success.
 // Old data pointer is kept
@@ -69,9 +69,8 @@ bool r_arr_refit(Resizeable_array *arr);
 #ifndef RESIZABLE_ARRAY_IMPLEMENTED
 #define RESIZABLE_ARRAY_IMPLEMENTED
 
-Resizeable_array r_arr_init(int sizeof_type)
+Resizeable_array r_arr_init(size_t sizeof_type)
 {
-
     Resizeable_array arr = {
         .max_size = INITIAL_SIZE,
         .real_size = 0,
@@ -208,7 +207,7 @@ bool r_arr_insert(Resizeable_array *arr, idx_t index, void *value)
     if (index > arr->real_size || index < 0)
     {
         // if it exceeds the end of array, just append at the end
-        index = arr->real_size;
+        index = arr->real_size - 1;
     }
 
     void *cur_ptr;
