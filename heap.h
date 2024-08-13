@@ -52,6 +52,7 @@ typedef struct
 {
     Heaptype_t type;
     Heapdatatype_t datatype;
+    size_t sizeof_type;
     Resizeable_array heap;
 } Heap;
 
@@ -79,29 +80,35 @@ void heap_free(Heap *hp);
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype)
 {
     Resizeable_array heaparr;
+    size_t sizeof_type;
     if (datatype == FLOAT)
     {
-        heaparr = r_arr_init(sizeof(float));
+        sizeof_type = sizeof(float);
+        heaparr = r_arr_init(sizeof_type);
     }
 
     else if (datatype == LONG)
     {
-        heaparr = r_arr_init(sizeof(long));
+        sizeof_type = sizeof(long);
+        heaparr = r_arr_init(sizeof_type);
     }
 
     else if (datatype == ULONG)
     {
-        heaparr = r_arr_init(sizeof(unsigned long));
+        sizeof_type = sizeof(unsigned long);
+        heaparr = r_arr_init(sizeof_type);
     }
 
     else if (datatype == INTEGER)
     {
-        heaparr = r_arr_init(sizeof(int));
+        sizeof_type = sizeof(int);
+        heaparr = r_arr_init(sizeof_type);
     }
 
     Heap hp = {
         .type = type,
         .datatype = datatype,
+        .sizeof_type = sizeof_type,
         .heap = heaparr};
 
     return hp;
@@ -115,15 +122,14 @@ bool heap_insert(Heap *hp, void *value)
 
 bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx)
 {
-    void *temp = malloc(hp->datatype);
+    void *temp = malloc(hp->sizeof_type);
     if (temp == NULL)
     {
         return false;
     }
-
-    temp = memcpy(temp, r_arr_get(&hp->heap, parent_idx), hp->datatype);
-    memmove(r_arr_get(&hp->heap, parent_idx), r_arr_get(&hp->heap, child_idx), hp->datatype);
-    memcpy(r_arr_get(&hp->heap, child_idx), temp, hp->datatype);
+    temp = memcpy(temp, r_arr_get(&hp->heap, parent_idx), hp->sizeof_type);
+    memmove(r_arr_get(&hp->heap, parent_idx), r_arr_get(&hp->heap, child_idx), hp->sizeof_type);
+    memcpy(r_arr_get(&hp->heap, child_idx), temp, hp->sizeof_type);
     free(temp);
 
     return true;
@@ -146,6 +152,7 @@ int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx)
 
     if (hp->datatype == FLOAT)
     {
+        // printf("parent: %f, child: %f\n", *(float *)parent, *(float *)child);
         if (*(float *)parent > *(float *)child)
         {
             return 1;
