@@ -19,8 +19,10 @@ typedef enum
     FLOAT,
     LONG,
     ULONG,
+    INTEGER
 } Heapdatatype_t;
 
+/* Possibly useful for a linked list implementation
 typedef struct Heapnode_f
 {
     float value;
@@ -44,19 +46,25 @@ typedef struct Heapnode_ul
     struct Heapnode_ul *rchild;
 
 } Heapnode_ul;
+*/
 
 typedef struct
 {
     Heaptype_t type;
     Heapdatatype_t datatype;
-    Resizeable_array *heap;
+    Resizeable_array heap;
 } Heap;
 
+// Options:
+// Heaptype: MAX, MIN
+// Heapdatatype: FLOAT, LONG, ULONG, INTEGER
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
-bool heap_insert(Heap hp, void *value);
+bool heap_insert(Heap *hp, void *value);
 void *heap_pop(Heap hp);
-bool _heap_swap(Heap hp, idx_t node);
-bool _heap_sort(Heap hp);
+bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx);
+int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx);
+void _heap_structurize(Heap *hp, idx_t parent);
+bool _heap_build(Heap *hp);
 Resizeable_array heapsort(Heap hp);
 void heap_free(Heap *hp);
 
@@ -86,17 +94,166 @@ Heap heap_init(Heaptype_t type, Heapdatatype_t datatype)
         heaparr = r_arr_init(sizeof(unsigned long));
     }
 
+    else if (datatype == INTEGER)
+    {
+        heaparr = r_arr_init(sizeof(int));
+    }
+
     Heap hp = {
         .type = type,
         .datatype = datatype,
-        .heap = &heaparr};
+        .heap = heaparr};
 
     return hp;
 }
 
+bool heap_insert(Heap *hp, void *value)
+{
+    r_arr_set(&hp->heap, -1, value);
+    return true;
+}
+
+bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx)
+{
+    void *temp = malloc(hp->datatype);
+    if (temp == NULL)
+    {
+        return false;
+    }
+
+    temp = memcpy(temp, r_arr_get(&hp->heap, parent_idx), hp->datatype);
+    memmove(r_arr_get(&hp->heap, parent_idx), r_arr_get(&hp->heap, child_idx), hp->datatype);
+    memcpy(r_arr_get(&hp->heap, child_idx), temp, hp->datatype);
+    free(temp);
+
+    return true;
+}
+
+// Returns:
+// 1 if parent is bigger
+// 0 if parent and child is equal
+//-1 if parent is smaller
+//-2 if datatype is not found
+//-3 if parent or child indexes are not valid
+int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx)
+{
+    void *parent = r_arr_get(&hp->heap, parent_idx);
+    void *child = r_arr_get(&hp->heap, child_idx);
+    if (parent == NULL || child == NULL)
+    {
+        return -3;
+    }
+
+    if (hp->datatype == FLOAT)
+    {
+        if (*(float *)parent > *(float *)child)
+        {
+            return 1;
+        }
+        else if (*(float *)parent == *(float *)child)
+        {
+            return 0;
+        }
+        return -1;
+    }
+
+    else if (hp->datatype == LONG)
+    {
+        if (*(long *)parent > *(long *)child)
+        {
+            return 1;
+        }
+        else if (*(long *)parent == *(long *)child)
+        {
+            return 0;
+        }
+        return -1;
+    }
+
+    else if (hp->datatype == ULONG)
+    {
+        if (*(unsigned long *)parent > *(unsigned long *)child)
+        {
+            return 1;
+        }
+        else if (*(unsigned long *)parent == *(unsigned long *)child)
+        {
+            return 0;
+        }
+        return -1;
+    }
+
+    else if (hp->datatype == INTEGER)
+    {
+        printf("parent: %d, child: %d\n", *(int *)parent, *(int *)child);
+        if (*(int *)parent > *(int *)child)
+        {
+            return 1;
+        }
+        else if (*(int *)parent == *(int *)child)
+        {
+            return 0;
+        }
+        return -1;
+    }
+
+    return -2;
+}
+
+void _heap_structurize(Heap *hp, idx_t parent_idx)
+{
+    idx_t left_child_idx = (parent_idx * 2) + 1;
+    idx_t right_child_idx = (parent_idx * 2) + 2;
+    idx_t max = parent_idx;
+    if (left_child_idx < hp->heap.real_size)
+    {
+        int left_child = _heap_compare_nodes(hp, parent_idx, left_child_idx);
+        if ((left_child == -1 && hp->type == MAX) || (left_child == 1 && hp->type == MIN))
+        {
+            max = left_child_idx;
+        }
+    }
+
+    if (right_child_idx < hp->heap.real_size)
+    {
+        int right_child = _heap_compare_nodes(hp, max, (right_child_idx));
+        if ((right_child == -1 && hp->type == MAX) || (right_child == 1 && hp->type == MIN))
+        {
+            max = right_child_idx;
+        }
+    }
+
+    if (max != parent_idx)
+    {
+        _heap_swap(hp, parent_idx, max);
+        _heap_structurize(hp, max);
+    }
+}
+
+bool _heap_build(Heap *hp)
+{
+    idx_t middle;
+    idx_t count = hp->heap.real_size - 1;
+
+    if (count % 2 == 0)
+    {
+        middle = (count / 2) - 1;
+    }
+    else
+    {
+        middle = (count / 2);
+    }
+
+    for (idx_t i = middle; i >= 0; i--)
+    {
+        _heap_structurize(hp, i);
+    }
+    return true;
+}
+
 void heap_free(Heap *hp)
 {
-    r_arr_free(hp->heap);
+    r_arr_free(&hp->heap);
 }
 
 #endif

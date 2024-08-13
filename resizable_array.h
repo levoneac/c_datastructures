@@ -184,7 +184,7 @@ bool r_arr_set(Resizeable_array *arr, idx_t index, void *value)
         return false;
     }
 
-    if (index >= arr->real_size)
+    if (index >= arr->real_size || index < 0)
     {
         // if it exceeds the end of array, just append at the end
         index = arr->real_size;
@@ -205,7 +205,7 @@ bool r_arr_insert(Resizeable_array *arr, idx_t index, void *value)
     }
 
     arr->real_size++;
-    if (index > arr->real_size)
+    if (index > arr->real_size || index < 0)
     {
         // if it exceeds the end of array, just append at the end
         index = arr->real_size;

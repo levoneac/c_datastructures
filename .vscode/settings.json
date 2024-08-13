@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        ".fantomasignore": "ignore",
+        "array": "c",
+        "string": "c",
+        "string_view": "c"
+    }
+}
