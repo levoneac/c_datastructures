@@ -56,20 +56,52 @@ typedef struct
     Resizeable_array heap;
 } Heap;
 
-// Options:
-// Heaptype: MAX, MIN
-// Heapdatatype: FLOAT, LONG, ULONG, INTEGER
+// Initializes an empty heap
+//  Options:
+//  Heaptype: MAX, MIN
+//  Heapdatatype: FLOAT, LONG, ULONG, INTEGER
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
+
+// Initializes a heap from an existing Resizeable_array
+// TODO: Important! Make a copy of the given array instead
 Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_array *arr);
+
+// Inserts given value into the heap
 bool heap_insert(Heap *hp, void *value);
+
+// Removes the node at the given index
+// TODO: look at the algorithm. Also return it maybe
 bool heap_delete(Heap *hp, idx_t index);
+
+// Removes the root node from the heap
+// TODO: return it
 void heap_pop(Heap *hp);
+
+// Finds the parent index given the child index
 idx_t _heap_get_parent(idx_t child_idx);
+
+// Swaps the parent and child node
 bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx);
+
+// Compares parent and child values. Returns:
+// 1 if parent is bigger
+// 0 if parent and child is equal
+//-1 if parent is smaller
+//-2 if datatype is not found
+//-3 if parent or child indexes are not valid
 int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx);
+
+// Recursive function that places the given parent in its right spot
 void _heap_structurize(Heap *hp, idx_t parent);
+
+// Runs stucturize on all the relevant nodes, resulting in a correct MIN or MAX heap
+// Returns true on success
 bool _heap_build(Heap *hp);
+
+// TODO
 Resizeable_array heapsort(Heap hp);
+
+// Frees the heap correctly
 void heap_free(Heap *hp);
 
 #endif // HEAP_DEFINITION
@@ -208,12 +240,6 @@ bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx)
     return true;
 }
 
-// Returns:
-// 1 if parent is bigger
-// 0 if parent and child is equal
-//-1 if parent is smaller
-//-2 if datatype is not found
-//-3 if parent or child indexes are not valid
 int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx)
 {
     void *parent = r_arr_get(&hp->heap, parent_idx);
