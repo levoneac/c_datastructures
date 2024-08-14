@@ -62,6 +62,7 @@ typedef struct
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
 Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_array *arr);
 bool heap_insert(Heap *hp, void *value);
+idx_t _heap_get_parent(idx_t child_idx);
 void *heap_pop(Heap hp);
 bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx);
 int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx);
@@ -131,7 +132,34 @@ Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_arr
 bool heap_insert(Heap *hp, void *value)
 {
     r_arr_set(&hp->heap, -1, value);
+    idx_t child = hp->heap.real_size - 1;
+    idx_t parent = _heap_get_parent(child);
+
+    while (_heap_compare_nodes(hp, parent, child) == -1)
+    {
+        _heap_swap(hp, parent, child);
+        child = parent;
+        parent = _heap_get_parent(child);
+    }
+
     return true;
+}
+
+idx_t _heap_get_parent(idx_t child_idx)
+{
+    if (child_idx == 0)
+    {
+        return 0;
+    }
+
+    if (child_idx % 2 == 0)
+    {
+        return (idx_t)((child_idx - 1) / 2);
+    }
+    else
+    {
+        return (idx_t)((child_idx) / 2);
+    }
 }
 
 bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx)
@@ -225,29 +253,29 @@ void _heap_structurize(Heap *hp, idx_t parent_idx)
 {
     idx_t left_child_idx = (parent_idx * 2) + 1;
     idx_t right_child_idx = (parent_idx * 2) + 2;
-    idx_t max = parent_idx;
+    idx_t extreme = parent_idx;
     if (left_child_idx < hp->heap.real_size)
     {
         int left_child = _heap_compare_nodes(hp, parent_idx, left_child_idx);
         if ((left_child == -1 && hp->type == MAX) || (left_child == 1 && hp->type == MIN))
         {
-            max = left_child_idx;
+            extreme = left_child_idx;
         }
     }
 
     if (right_child_idx < hp->heap.real_size)
     {
-        int right_child = _heap_compare_nodes(hp, max, (right_child_idx));
+        int right_child = _heap_compare_nodes(hp, extreme, (right_child_idx));
         if ((right_child == -1 && hp->type == MAX) || (right_child == 1 && hp->type == MIN))
         {
-            max = right_child_idx;
+            extreme = right_child_idx;
         }
     }
 
-    if (max != parent_idx)
+    if (extreme != parent_idx)
     {
-        _heap_swap(hp, parent_idx, max);
-        _heap_structurize(hp, max);
+        _heap_swap(hp, parent_idx, extreme);
+        _heap_structurize(hp, extreme);
     }
 }
 
