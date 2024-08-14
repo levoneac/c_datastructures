@@ -64,6 +64,9 @@ void r_arr_free(Resizeable_array *arr);
 // Returns false if reduction could be done but allocation failed
 bool r_arr_refit(Resizeable_array *arr);
 
+// Returns a deep copy of the array
+Resizeable_array r_arr_copy(Resizeable_array *arr);
+
 #endif // RESIZABLE_ARRAY_H
 #ifdef RESIZABLE_ARRAY_IMPLEMENTATION
 #ifndef RESIZABLE_ARRAY_IMPLEMENTED
@@ -260,6 +263,21 @@ void r_arr_free(Resizeable_array *arr)
     //  this frees the whole block
     //  and as we only have memcpy'd within the block, it also frees the memcpy'ed values
     free(arr->data);
+}
+
+Resizeable_array r_arr_copy(Resizeable_array *arr)
+{
+    // should check if NULL ig
+    void *new_arr_data = malloc(arr->max_size * arr->sizeof_type);
+    memcpy(new_arr_data, arr->data, (arr->max_size * arr->sizeof_type));
+
+    Resizeable_array new_arr = {
+        .max_size = arr->max_size,
+        .real_size = arr->real_size,
+        .sizeof_type = arr->sizeof_type,
+        .data = new_arr_data};
+
+    return new_arr;
 }
 #endif
 #endif
