@@ -62,8 +62,9 @@ typedef struct
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
 Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_array *arr);
 bool heap_insert(Heap *hp, void *value);
+bool heap_delete(Heap *hp, idx_t index);
+void heap_pop(Heap *hp);
 idx_t _heap_get_parent(idx_t child_idx);
-void *heap_pop(Heap hp);
 bool _heap_swap(Heap *hp, idx_t parent_idx, idx_t child_idx);
 int _heap_compare_nodes(Heap *hp, idx_t parent_idx, idx_t child_idx);
 void _heap_structurize(Heap *hp, idx_t parent);
@@ -135,7 +136,7 @@ bool heap_insert(Heap *hp, void *value)
     idx_t child = hp->heap.real_size - 1;
     idx_t parent = _heap_get_parent(child);
 
-    while (_heap_compare_nodes(hp, parent, child) == -1)
+    while ((hp->type == MAX && _heap_compare_nodes(hp, parent, child) == -1) || (hp->type == MIN && _heap_compare_nodes(hp, parent, child) == 1))
     {
         _heap_swap(hp, parent, child);
         child = parent;
@@ -143,6 +144,36 @@ bool heap_insert(Heap *hp, void *value)
     }
 
     return true;
+}
+
+bool heap_delete(Heap *hp, idx_t index)
+{
+    idx_t last = hp->heap.real_size - 1;
+    if (index == -1)
+    {
+        index = last;
+    }
+    if (index >= hp->heap.real_size)
+    {
+        return false;
+    }
+
+    if (index != last)
+    {
+        _heap_swap(hp, index, last);
+    }
+    r_arr_remove(&hp->heap, last);
+    _heap_build(hp);
+
+    return true;
+}
+
+void heap_pop(Heap *hp)
+{
+    idx_t last = hp->heap.real_size - 1;
+    _heap_swap(hp, 0, last);
+    r_arr_remove(&hp->heap, last);
+    _heap_structurize(hp, 0);
 }
 
 idx_t _heap_get_parent(idx_t child_idx)
