@@ -63,7 +63,7 @@ typedef struct
 Heap heap_init(Heaptype_t type, Heapdatatype_t datatype);
 
 // Initializes a heap from an existing Resizeable_array
-// TODO: Important! Make a copy of the given array instead
+// Makes a copy of the original array
 Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_array *arr);
 
 // Inserts given value into the heap
@@ -151,11 +151,12 @@ Heap heap_init(Heaptype_t type, Heapdatatype_t datatype)
 
 Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_array *arr)
 {
+    // Resizeable_array arr_copy = r_arr_copy(arr);
     Heap hp = {
         .type = type,
         .datatype = datatype,
         .sizeof_type = arr->sizeof_type,
-        .heap = *arr};
+        .heap = r_arr_copy(arr)};
 
     _heap_build(&hp);
 
