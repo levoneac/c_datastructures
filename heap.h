@@ -70,12 +70,13 @@ Heap heap_init_from_arr(Heaptype_t type, Heapdatatype_t datatype, Resizeable_arr
 bool heap_insert(Heap *hp, void *value);
 
 // Removes the node at the given index
-// TODO: look at the algorithm. Also return it maybe
-bool heap_delete(Heap *hp, idx_t index);
+// If want_return is true, it allocates memory for the value and returns a pointer to it
+// TODO: look at the algorithm.
+void *heap_delete(Heap *hp, idx_t index, bool want_return);
 
 // Removes the root node from the heap
-// TODO: return it
-void heap_pop(Heap *hp);
+// If want_return is true, it allocates memory for the value and returns a pointer to it
+void *heap_pop(Heap *hp, bool want_return);
 
 // Finds the parent index given the child index
 idx_t _heap_get_parent(idx_t child_idx);
@@ -179,7 +180,7 @@ bool heap_insert(Heap *hp, void *value)
     return true;
 }
 
-bool heap_delete(Heap *hp, idx_t index)
+void *heap_delete(Heap *hp, idx_t index, bool want_return)
 {
     idx_t last = hp->heap.real_size - 1;
     if (index == -1)
@@ -188,25 +189,41 @@ bool heap_delete(Heap *hp, idx_t index)
     }
     if (index >= hp->heap.real_size)
     {
-        return false;
+        return NULL;
     }
 
     if (index != last)
     {
         _heap_swap(hp, index, last);
     }
+    void *value = NULL;
+
+    if (want_return == true)
+    {
+        value = malloc(hp->sizeof_type);
+        value = memcpy(value, r_arr_get(&hp->heap, last), hp->sizeof_type);
+    }
+
     r_arr_remove(&hp->heap, last);
     _heap_build(hp);
 
-    return true;
+    return value;
 }
 
-void heap_pop(Heap *hp)
+void *heap_pop(Heap *hp, bool want_return)
 {
     idx_t last = hp->heap.real_size - 1;
     _heap_swap(hp, 0, last);
+
+    void *value = NULL;
+    if (want_return == true)
+    {
+        value = malloc(hp->sizeof_type);
+        value = memcpy(value, r_arr_get(&hp->heap, last), hp->sizeof_type);
+    }
     r_arr_remove(&hp->heap, last);
     _heap_structurize(hp, 0);
+    return value;
 }
 
 idx_t _heap_get_parent(idx_t child_idx)
