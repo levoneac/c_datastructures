@@ -29,7 +29,6 @@ typedef struct
 Resizeable_array r_arr_init(size_t sizeof_type);
 
 // Returns false on failure and true on success.
-// Old data pointer is kept
 bool _r_arr_realloc(Resizeable_array *arr);
 
 // Sets element at index to value
@@ -44,11 +43,12 @@ bool r_arr_insert(Resizeable_array *arr, idx_t index, void *value);
 void *r_arr_get(Resizeable_array *arr, idx_t index);
 
 // Removes element at given index
-bool r_arr_remove(Resizeable_array *arr, idx_t index);
+// Returns a pointer to allocated memory with the removed data if want_return is true
+void *r_arr_remove(Resizeable_array *arr, idx_t index, bool want_return);
 
 // Removes and gets element at last index
-// !Memoty gets allocated for the returned element here!
-void *r_arr_pop(Resizeable_array *arr);
+// Returns a pointer to allocated memory with the removed data if want_return is true
+void *r_arr_pop(Resizeable_array *arr, bool want_return);
 
 // Returns index of first found value
 idx_t r_arr_find(Resizeable_array *arr, void *value);
@@ -133,16 +133,23 @@ void *_r_arr_get_dataptr_from_index(Resizeable_array *arr, idx_t index)
     return data_start;
 }
 
-bool r_arr_remove(Resizeable_array *arr, idx_t index)
+void *r_arr_remove(Resizeable_array *arr, idx_t index, bool want_return)
 {
+    void *value = NULL;
     if (index >= arr->real_size)
     {
-        return false;
+        return value;
+    }
+
+    if (want_return == true)
+    {
+        value = malloc(arr->sizeof_type);
+        value = memcpy(value, _r_arr_get_dataptr_from_index(arr, index), arr->sizeof_type);
     }
     if (index == arr->real_size - 1)
     {
         arr->real_size--;
-        return true;
+        return value;
     }
 
     void *data_cur;
@@ -154,14 +161,12 @@ bool r_arr_remove(Resizeable_array *arr, idx_t index)
         memcpy(data_cur, data_next, arr->sizeof_type);
     }
     arr->real_size--;
-    return true;
+    return value;
 }
 
-void *r_arr_pop(Resizeable_array *arr)
+void *r_arr_pop(Resizeable_array *arr, bool want_return)
 {
-    void *ret = malloc(arr->sizeof_type);
-    memcpy(ret, _r_arr_get_dataptr_from_index(arr, arr->real_size - 1), arr->sizeof_type);
-    r_arr_remove(arr, arr->real_size - 1);
+    void *ret = r_arr_remove(arr, arr->real_size - 1, want_return);
     return ret;
 }
 

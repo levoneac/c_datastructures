@@ -198,13 +198,7 @@ void *heap_delete(Heap *hp, idx_t index, bool want_return)
     }
     void *value = NULL;
 
-    if (want_return == true)
-    {
-        value = malloc(hp->sizeof_type);
-        value = memcpy(value, r_arr_get(&hp->heap, last), hp->sizeof_type);
-    }
-
-    r_arr_remove(&hp->heap, last);
+    value = r_arr_remove(&hp->heap, last, want_return);
     _heap_build(hp);
 
     return value;
@@ -216,12 +210,7 @@ void *heap_pop(Heap *hp, bool want_return)
     _heap_swap(hp, 0, last);
 
     void *value = NULL;
-    if (want_return == true)
-    {
-        value = malloc(hp->sizeof_type);
-        value = memcpy(value, r_arr_get(&hp->heap, last), hp->sizeof_type);
-    }
-    r_arr_remove(&hp->heap, last);
+    value = r_arr_remove(&hp->heap, last, want_return);
     _heap_structurize(hp, 0);
     return value;
 }
